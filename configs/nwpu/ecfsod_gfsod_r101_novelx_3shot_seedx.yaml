@@ -1,0 +1,58 @@
+_BASE_: "../Base-RCNN.yaml"
+MODEL:
+  WEIGHTS: "/Path/to/Base/Pretrain/Weight"
+  MASK_ON: False
+  RESNETS:
+    DEPTH: 101
+  BACKBONE:
+    FREEZE: False
+  PROPOSAL_GENERATOR:
+    NAME: "ECFRPN"
+  RPN:
+    ENABLE_DECOUPLE: True
+    BACKWARD_SCALE: 0.0
+    FREEZE: False
+    HEAD_NAME: "ECFRPNHead"
+    REG_LOSS_TYPE: "iou"
+    REG_LOSS_WEIGHT: 1.0
+    LOC_LOSS_TYPE: "smooth_l1"
+    LOC_LOSS_WEIGHT: 1.0
+    POSITIVE_FRACTION_OBJECTNESS: 1.0
+    NMS_THRESH: 0.7 
+    NMS_THRESH_TEST: 0.5
+  ROI_HEADS:
+    NUM_CLASSES: 10
+    ENABLE_DECOUPLE: True
+    BACKWARD_SCALE: 0.1
+    CLS_DROPOUT: True
+    FREEZE_FEAT: True
+    NAME: "ECFSODROIHeads"
+    NMS_THRESH_TEST: 0.5
+    SCORE_THRESH: 0.05
+    NMS_THRESH: 0.5
+    TOPK: 50
+  CPLN:
+    EMD_DIM: 256
+    ALPHA: 0.2
+    BETA: 0.8
+    DISTANCE_TYPE: "COS"
+    REPS_PER_CLASS: 1
+    IOU_THRESHOLD: 0.5
+    LOSS_WEIGHT: 1.0
+INPUT:
+  MIN_SIZE_TRAIN: (480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800)
+  MIN_SIZE_TEST: 800
+DATASETS:
+  TRAIN: ("nwpu_trainval_allx_3shot_seedx", )
+  TEST: ('nwpu_test_allx',)
+SOLVER:
+  IMS_PER_BATCH: 4
+  BASE_LR: 0.001
+  STEPS: (6000,)
+  MAX_ITER: 6000 
+  CHECKPOINT_PERIOD: 10000
+  WARMUP_ITERS: 0
+TEST:
+  PCB_ENABLE: True
+  PCB_MODELPATH: "/Path/to/ImageNet/Pre-Train/Weight"
+OUTPUT_DIR: "/Path/to/Output/Dir"
